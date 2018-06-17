@@ -273,6 +273,48 @@ Expected status code 201 but received 404.
 Failed asserting that false is true.
 ```
 
+9. Create controller which will handle all concert ticket orders request by executing the following command
+```
+php artisan make:controller ConcertOrderController --model="App\Concert" --api
+```
+
+Open the file ticketbeast/Http/Controllers/ConcertOrderController.php and locate the following code
+```
+	public function store(Request $request)
+    {
+        //
+    }
+```
+
+Let's update it to the following for now
+```
+	public function store(Request $request)
+    {
+        return response()->json([], 201);
+    }
+```
+
+Save the changes and running the test will still result to the following error
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Expected status code 201 but received 404.
+Failed asserting that false is true.
+```
+
+Open ticketbeast/routes/web.php and append the following code
+```
+Route::post('concerts/{concert}/orders', 'ConcertOrderController@store');
+```
+
+Run the test again and BOOM! Our first green light! (technically!)
+```
+PHPUnit 7.2.4 by Sebastian Bergmann and contributors.
+
+.                                                                   1 / 1 (100%)
+
+Time: 157 ms, Memory: 16.00MB
+```
+
 ## Running the tests
 
 Explain how to run the automated tests for this system
