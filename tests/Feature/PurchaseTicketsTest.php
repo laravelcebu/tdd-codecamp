@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Billing\FakePaymentGateway;
 use App\Concert;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,6 +17,7 @@ class PurchaseTicketsTest extends TestCase
     public function customer_can_purchase_tickets()
     {
         // Arrange
+        $paymentGateway = new FakePaymentGateway();
         $concert = factory(Concert::class)->create([
         	'ticket_price' => 3250
         ]);

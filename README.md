@@ -371,6 +371,99 @@ At this point you should be seeing the following error
 ErrorException: Undefined variable: paymentGateway
 ```
 
+12. Create a folder app/Billing and create a file FakePaymentGateway.php under it
+
+Open and update it's contents to 
+```
+<?php
+
+namespace App\Billing;
+
+class FakePaymentGateway
+{
+
+}
+```
+
+Now let's go over to PurchaseTicketsTest.php and add the following code
+```
+$paymentGateway = new FakePaymentGateway();
+```
+
+So that it now looks like this
+```
+// Arrange
+$paymentGateway = new FakePaymentGateway();
+$concert = factory(Concert::class)->create([
+    'ticket_price' => 3250
+]);
+``` 
+
+After running the test again, the error should have now changed to
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Error: Class 'Tests\Feature\FakePaymentGateway' not found
+```
+
+Fixing the reference should be easy enough, like this
+```
+use App\Billing\FakePaymentGateway;
+use App\Concert;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+```
+
+Save, run the test and now we got ourselves a different error
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Error: Call to undefined method App\Billing\FakePaymentGateway::getValidTestToken()
+```
+
+Let's add the following method to FakePaymentGateway.php
+```
+public function getValidTestToken()
+{
+    return 'valid-token';
+}
+```
+
+Save and run again to arrive at the following error
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Error: Call to undefined method App\Billing\FakePaymentGateway::totalCharges()
+```
+
+This time let's update FakePaymentGateway.php so that it now looks like this
+```
+class FakePaymentGateway
+{
+    protected $charges;
+
+    public function __construct()
+    {
+        $this->charges = collect();
+    }
+
+    public function getValidTestToken()
+    {
+        return 'valid-token';
+    }
+
+    public function totalCharges()
+    {
+        return $this->charges->sum();
+    }
+}
+```
+**NOTE: Please refer to the official documentation for [collect](https://laravel.com/docs/5.6/collections)**
+
+At this point the error should now be
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Failed asserting that 0 matches expected 9750.
+```
 
 ## Running the tests
 
