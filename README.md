@@ -176,6 +176,43 @@ Will now give us the following result
 Illuminate\Database\QueryException: SQLSTATE[HY000] [1045] Access denied for user 'homestead'@'localhost' (using password: YES) (SQL: insert into `concerts` (`updated_at`, `created_at`) values (2018-06-17 09:05:06, 2018-06-17 09:05:06))
 ```
 
+7. Open the file ticketbeast\phpunit.xml and locate the following code
+```
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="CACHE_DRIVER" value="array"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="QUEUE_DRIVER" value="sync"/>
+        <env name="MAIL_DRIVER" value="array"/>
+    </php>
+```
+
+Update it to
+```
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="CACHE_DRIVER" value="array"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="QUEUE_DRIVER" value="sync"/>
+        <env name="MAIL_DRIVER" value="array"/>
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+    </php>
+```
+
+Save the changes and run the test again
+```
+./vendor/bin/phpunit --filter=customer_can_purchase_tickets
+```
+
+This will now result to the following error
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: concerts (SQL: insert into "concerts" ("updated_at", "created_at") values (2018-06-17 09:18:25, 2018-06-17 09:18:25))
+```
+
 
 ## Running the tests
 
