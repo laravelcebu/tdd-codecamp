@@ -41,9 +41,51 @@ Step by step documentation of the afternoon tdd hands on session
 ```
 laravel new ticketbeast
 ```
+
 2. Execute the following command
 ```
 php artisan make:test PurchaseTicketsTest
+```
+
+3. Open the file app/tests/Feature/PurchaseTicketsTest.php and locate the following code 
+```
+    /**
+     * A basic test example.
+     *
+     * @return void
+     */
+    public function testExample()
+    {
+        $this->assertTrue(true);
+    }
+```
+
+Replace it with the following code
+```
+    /** @test */
+    public function customer_can_purchase_tickets()
+    {
+    	
+        // Arrange
+        
+        // Act
+        
+        // Assert
+    }
+```
+
+Save the changes and run the test using the following command
+```
+./vendor/bin/phpunit --filter=customer_can_purchase_tickets
+```
+
+Which will give you the following result
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+This test did not perform any assertions
+
+OK, but incomplete, skipped, or risky tests!
+Tests: 1, Assertions: 0, Risky: 1.
 ```
 
 ## Running the tests

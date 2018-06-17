@@ -8,13 +8,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class PurchaseTicketsTest extends TestCase
 {
-    /**
-     * A basic test example.
-     *
-     * @return void
-     */
-    public function testExample()
+    /** @test */
+    public function customer_can_purchase_tickets()
     {
-        $this->assertTrue(true);
-    }
+    	
+        // Arrange
+        
+        // Act
+        
+        // Assert
+    } 
 }
