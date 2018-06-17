@@ -306,7 +306,7 @@ Open ticketbeast/routes/web.php and append the following code
 Route::post('concerts/{concert}/orders', 'ConcertOrderController@store');
 ```
 
-Run the test again and BOOM! Our first green light! (technically!)
+Run the test again and BOOM! Our first green light! :muscle: (technically!)
 ```
 PHPUnit 7.2.4 by Sebastian Bergmann and contributors.
 
@@ -344,6 +344,31 @@ Running the test will now give us the error
 ```
 1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
 Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table concerts has no column named ticket_price (SQL: insert into "concerts" ("ticket_price", "updated_at", "created_at") values (3250, 2018-06-17 10:18:09, 2018-06-17 10:18:09))
+```
+
+11. Open the create_concerts_table migration file and locate the following code
+**NOTE: Exact file names will be prefixed differently, _\<prefix\>_create_concerts_table.php_** 
+
+```
+Schema::create('concerts', function (Blueprint $table) {
+    $table->increments('id');
+    $table->timestamps();
+});
+```
+
+Add a column for ticket price, save and run the test
+```
+Schema::create('concerts', function (Blueprint $table) {
+    $table->increments('id');
+    $table->integer('ticket_price');
+    $table->timestamps();
+});
+```
+
+At this point you should be seeing the following error
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+ErrorException: Undefined variable: paymentGateway
 ```
 
 
