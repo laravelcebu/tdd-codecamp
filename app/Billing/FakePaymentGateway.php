@@ -20,4 +20,9 @@ class FakePaymentGateway
     {
         return $this->charges->sum();
     }
+
+    public function charge($amount, $token)
+    {
+        $this->charges->push($amount);
+    }
 }

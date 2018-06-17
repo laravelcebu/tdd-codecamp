@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Billing\FakePaymentGateway;
 use App\Concert;
 use Illuminate\Http\Request;
 
@@ -23,8 +24,14 @@ class ConcertOrderController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $concertId)
     {
+        $paymentGateway = new FakePaymentGateway();
+        $concert = Concert::find($concertId);
+
+        $amount = $concert->ticket_price * $request->get('ticket_quantity');
+        $paymentGateway->charge($amount, $request->get('payment_gateway'));
+
         return response()->json([], 201);
     }
 

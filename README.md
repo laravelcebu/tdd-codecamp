@@ -465,6 +465,79 @@ At this point the error should now be
 Failed asserting that 0 matches expected 9750.
 ```
 
+13. Head over to ConcertOrderController.php and update the store method to
+```
+public function store(Request $request, $concertId)
+{
+    $paymentGateway = new FakePaymentGateway();
+    $concert = Concert::find($concertId);
+
+    $amount = $concert->ticket_price * $request->get('ticket_quantity');
+    $paymentGateway->charge($amount, $request->get('payment_gateway'));
+
+    return response()->json([], 201);
+}
+```
+
+Running the test will now result to
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Expected status code 201 but received 500.
+Failed asserting that false is true.
+```
+
+Which isn't very helpful so let's open app\Exceptions\Handler.php, find and update the report method to
+```
+public function report(Exception $exception)
+{
+    throw $exception;
+    parent::report($exception);
+}
+```
+**NOTE: During the actual hands on session, the report method was updated somewhere between step 8 and 9.**
+
+If we run the test again it will now give us
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Symfony\Component\Debug\Exception\FatalThrowableError: Class 'App\Http\Controllers\FakePaymentGateway' not found
+```
+
+Ah, much better. Do remember to remove the throw before you publish your code, it is meant for debugging only!
+
+Let's go ahead and add a reference to FakePaymentGateway
+```
+use App\Billing\FakePaymentGateway;
+use App\Concert;
+use Illuminate\Http\Request;
+
+class ConcertOrderController extends Controller
+```
+
+Once we have that the error should now be
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Symfony\Component\Debug\Exception\FatalThrowableError: Call to undefined method App\Billing\FakePaymentGateway::charge()
+```
+
+Go ahead and define that method
+```
+public function charge($amount, $token)
+{
+    $this->charges->push($amount);
+}
+```
+
+Save and run the test so the result will now be 
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Failed asserting that 0 matches expected 9750.
+```
+
+
+
+
+
+
 ## Running the tests
 
 Explain how to run the automated tests for this system
