@@ -160,6 +160,23 @@ Running the test again will now result to
 InvalidArgumentException: Unable to locate factory with name [default] [App\Concert].
 ```
 
+6. Create a concert factory by executing the following command
+```
+php artisan make:factory ConcertFactory --model="App\Concert"
+```
+
+Running the test
+```
+./vendor/bin/phpunit --filter=customer_can_purchase_tickets
+```
+
+Will now give us the following result
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Illuminate\Database\QueryException: SQLSTATE[HY000] [1045] Access denied for user 'homestead'@'localhost' (using password: YES) (SQL: insert into `concerts` (`updated_at`, `created_at`) values (2018-06-17 09:05:06, 2018-06-17 09:05:06))
+```
+
+
 ## Running the tests
 
 Explain how to run the automated tests for this system
