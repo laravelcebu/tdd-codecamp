@@ -115,6 +115,51 @@ Which will give you the following result
 Error: Class 'Tests\Feature\Concert' not found
 ```
 
+5. Create the Concert model by executing the following command
+```
+php artisan make:model Concert
+```
+
+Run the test using the following command
+```
+./vendor/bin/phpunit --filter=customer_can_purchase_tickets
+```
+
+Which will still give you the following result
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Error: Class 'Tests\Feature\Concert' not found
+```
+
+Let's fix that by updating the following code
+```
+namespace Tests\Feature;
+
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+class PurchaseTicketsTest extends TestCase
+```
+
+By aliasing our newly created Concert model
+```
+namespace Tests\Feature;
+
+use App\Concert;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+
+class PurchaseTicketsTest extends TestCase
+```
+
+Running the test again will now result to
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+InvalidArgumentException: Unable to locate factory with name [default] [App\Concert].
+```
+
 ## Running the tests
 
 Explain how to run the automated tests for this system
