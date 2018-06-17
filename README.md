@@ -37,9 +37,13 @@ Step by step documentation of the afternoon tdd hands on session
 
 ### Steps
 
-1. Open your terminal, navigate to your development directory and execute to following command 
+1. Open your terminal, navigate to your development directory and execute the following command 
 ```
 laravel new ticketbeast
+```
+2. Execute the following command
+```
+php artisan make:test PurchaseTicketsTest
 ```
 
 ## Running the tests
