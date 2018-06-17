@@ -315,6 +315,38 @@ PHPUnit 7.2.4 by Sebastian Bergmann and contributors.
 Time: 157 ms, Memory: 16.00MB
 ```
 
+10. Next, let's update our customer_can_purchase_tickets to the following code
+```
+	public function customer_can_purchase_tickets()
+    {
+        // Arrange
+        $concert = factory(Concert::class)->create([
+        	'ticket_price' => 3250
+        ]);
+
+        // Act
+        $response = $this->post("concerts/{$concert->id}/orders", [
+        	'email' 			=> 'john@example.com',
+            'ticket_quantity' 	=> 3,
+            'payment_gateway' 	=> $paymentGateway->getValidTestToken()
+        ]);
+
+        // Assert
+        $response->assertStatus(201);
+
+        $this->assertEquals(9750, $paymentGateway->totalCharges());
+    }
+```
+
+Quick note, total charges = ticket price x ticket quantity = 3250 x 3 = 9750
+
+Running the test will now give us the error
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table concerts has no column named ticket_price (SQL: insert into "concerts" ("ticket_price", "updated_at", "created_at") values (3250, 2018-06-17 10:18:09, 2018-06-17 10:18:09))
+```
+
+
 ## Running the tests
 
 Explain how to run the automated tests for this system
