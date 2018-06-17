@@ -88,6 +88,33 @@ OK, but incomplete, skipped, or risky tests!
 Tests: 1, Assertions: 0, Risky: 1.
 ```
 
+4. Update the code to the following
+```
+    /** @test */
+    public function customer_can_purchase_tickets()
+    {
+        // Arrange
+        $concert = factory(Concert::class)->create();
+
+        // Act
+        $response = $this->post("concerts/{$concert->id}/orders", []);
+
+        // Assert
+        $response->assertStatus(201);
+    }
+```
+
+Save the changes and run the test using the following command
+```
+./vendor/bin/phpunit --filter=customer_can_purchase_tickets
+```
+
+Which will give you the following result
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Error: Class 'Tests\Feature\Concert' not found
+```
+
 ## Running the tests
 
 Explain how to run the automated tests for this system
