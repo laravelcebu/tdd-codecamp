@@ -3,12 +3,15 @@
 namespace Tests\Feature;
 
 use App\Concert;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class PurchaseTicketsTest extends TestCase
 {
+	use DatabaseMigrations;
+	
     /** @test */
     public function customer_can_purchase_tickets()
     {

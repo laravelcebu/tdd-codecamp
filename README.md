@@ -213,6 +213,65 @@ This will now result to the following error
 Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: concerts (SQL: insert into "concerts" ("updated_at", "created_at") values (2018-06-17 09:18:25, 2018-06-17 09:18:25))
 ```
 
+8. Create a migration file by executing the following command
+```
+php artisan make:migration create_concerts_table --create=concerts
+```
+
+Running the test will still result to
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: concerts (SQL: insert into "concerts" ("updated_at", "created_at") values (2018-06-17 09:18:25, 2018-06-17 09:18:25))
+```
+
+Locate the following code in PurchaseTicketsTest.php 
+```
+class PurchaseTicketsTest extends TestCase
+{
+    /** @test */
+    public function customer_can_purchase_tickets()
+    {
+```
+
+And let's update it to 
+```
+class PurchaseTicketsTest extends TestCase
+{
+	use DatabaseMigrations;
+
+	/** @test */
+    public function customer_can_purchase_tickets()
+    {
+```
+
+Running the test will now give us the following error
+```
+PHP Fatal error:  Trait 'Tests\Feature\DatabaseMigrations' not found in /ticketbeast/tests/Feature/PurchaseTicketsTest.php on line 12
+```
+
+Go back to PurchaseTicketsTest.php and locate the following code
+```
+use App\Concert;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+```
+
+Update it to the following code, save and run the test again
+```
+use App\Concert;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+```
+
+It should now give us the following error
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Expected status code 201 but received 404.
+Failed asserting that false is true.
+```
 
 ## Running the tests
 
