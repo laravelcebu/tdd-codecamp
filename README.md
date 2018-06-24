@@ -1,77 +1,55 @@
 # tdd-codecamp
 
-Step by step reference for the hands on session during the June 16, 2018 TDD codecamp
+Step by step reference for the hands on session during the June 16, 2018 TDD codecamp.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine. See [commits](https://github.com/laravelcebu/tdd-codecamp/commits/master) section for reference to the actual code changes made at each step.
 
-### Prerequisites
+## Prerequisites
 
-What things you need to install the software and how to install them
+- Laravel 5.6
 
-```
-Give examples
-```
-
-### Installing
-
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Codecamp
-Step by step documentation of the afternoon tdd hands on session
+## Instructions
+Step by step documentation of the afternoon tdd hands on session.
 
 ### Steps
 
-1. Open your terminal, navigate to your development directory and execute the following command 
+1. Let's begin by creating a new Laravel application. Open your terminal, navigate to your development directory and execute the following command 
 ```
 laravel new ticketbeast
 ```
 
-2. Execute the following command
+2. Next we need to make our test file. This can be achieve using the following command
 ```
 php artisan make:test PurchaseTicketsTest
 ```
 
-3. Open the file app/tests/Feature/PurchaseTicketsTest.php and locate the following code 
+3. Time to create our test case! Open the file app/tests/Feature/PurchaseTicketsTest.php and locate the following code 
 ```
-    /**
-     * A basic test example.
-     *
-     * @return void
-     */
-    public function testExample()
-    {
-        $this->assertTrue(true);
-    }
+/**
+ * A basic test example.
+ *
+ * @return void
+ */
+public function testExample()
+{
+    $this->assertTrue(true);
+}
 ```
 
-Replace it with the following code
+Replace it with this bit
 ```
-    /** @test */
-    public function customer_can_purchase_tickets()
-    {
-    	
-        // Arrange
-        
-        // Act
-        
-        // Assert
-    }
+/** @test */
+public function customer_can_purchase_tickets()
+{
+	
+    // Arrange
+    
+    // Act
+    
+    // Assert
+}
 ```
 
 Save the changes and run the test using the following command
@@ -88,44 +66,43 @@ OK, but incomplete, skipped, or risky tests!
 Tests: 1, Assertions: 0, Risky: 1.
 ```
 
-4. Update the code to the following
+**NOTE: The filter option indicates that only the given test case will be executed**
+
+4. Lets add a couple more lines to reflect the general idea of how the test case should look like
 ```
-    /** @test */
-    public function customer_can_purchase_tickets()
-    {
-        // Arrange
-        $concert = factory(Concert::class)->create();
+/** @test */
+public function customer_can_purchase_tickets()
+{
+    // Arrange
+    $concert = factory(Concert::class)->create();
 
-        // Act
-        $response = $this->post("concerts/{$concert->id}/orders", []);
+    // Act
+    $response = $this->post("concerts/{$concert->id}/orders", []);
 
-        // Assert
-        $response->assertStatus(201);
-    }
+    // Assert
+    $response->assertStatus(201);
+}
 ```
 
-Save the changes and run the test using the following command
+Save the changes and run the test again. Please note that we will be using the same command to run the test unless specified otherwise.
 ```
 ./vendor/bin/phpunit --filter=customer_can_purchase_tickets
 ```
 
-Which will give you the following result
+At this point you should be seeing the following error
 ```
 1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
 Error: Class 'Tests\Feature\Concert' not found
 ```
+
+**TIP: Use the up arrow key to cycle thru your previously executed commands instead of typing or copy/paste to save time.**
 
 5. Create the Concert model by executing the following command
 ```
 php artisan make:model Concert
 ```
 
-Run the test using the following command
-```
-./vendor/bin/phpunit --filter=customer_can_purchase_tickets
-```
-
-Which will still give you the following result
+You will find out after running the test that we are still getting the same error
 ```
 1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
 Error: Class 'Tests\Feature\Concert' not found
@@ -165,12 +142,7 @@ InvalidArgumentException: Unable to locate factory with name [default] [App\Conc
 php artisan make:factory ConcertFactory --model="App\Concert"
 ```
 
-Running the test
-```
-./vendor/bin/phpunit --filter=customer_can_purchase_tickets
-```
-
-Will now give us the following result
+Run the test and arrive at the following error
 ```
 1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
 Illuminate\Database\QueryException: SQLSTATE[HY000] [1045] Access denied for user 'homestead'@'localhost' (using password: YES) (SQL: insert into `concerts` (`updated_at`, `created_at`) values (2018-06-17 09:05:06, 2018-06-17 09:05:06))
@@ -178,36 +150,31 @@ Illuminate\Database\QueryException: SQLSTATE[HY000] [1045] Access denied for use
 
 7. Open the file ticketbeast\phpunit.xml and locate the following code
 ```
-    <php>
-        <env name="APP_ENV" value="testing"/>
-        <env name="BCRYPT_ROUNDS" value="4"/>
-        <env name="CACHE_DRIVER" value="array"/>
-        <env name="SESSION_DRIVER" value="array"/>
-        <env name="QUEUE_DRIVER" value="sync"/>
-        <env name="MAIL_DRIVER" value="array"/>
-    </php>
+<php>
+    <env name="APP_ENV" value="testing"/>
+    <env name="BCRYPT_ROUNDS" value="4"/>
+    <env name="CACHE_DRIVER" value="array"/>
+    <env name="SESSION_DRIVER" value="array"/>
+    <env name="QUEUE_DRIVER" value="sync"/>
+    <env name="MAIL_DRIVER" value="array"/>
+</php>
 ```
 
 Update it to
 ```
-    <php>
-        <env name="APP_ENV" value="testing"/>
-        <env name="BCRYPT_ROUNDS" value="4"/>
-        <env name="CACHE_DRIVER" value="array"/>
-        <env name="SESSION_DRIVER" value="array"/>
-        <env name="QUEUE_DRIVER" value="sync"/>
-        <env name="MAIL_DRIVER" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
-    </php>
+<php>
+    <env name="APP_ENV" value="testing"/>
+    <env name="BCRYPT_ROUNDS" value="4"/>
+    <env name="CACHE_DRIVER" value="array"/>
+    <env name="SESSION_DRIVER" value="array"/>
+    <env name="QUEUE_DRIVER" value="sync"/>
+    <env name="MAIL_DRIVER" value="array"/>
+    <env name="DB_CONNECTION" value="sqlite"/>
+    <env name="DB_DATABASE" value=":memory:"/>
+</php>
 ```
 
-Save the changes and run the test again
-```
-./vendor/bin/phpunit --filter=customer_can_purchase_tickets
-```
-
-This will now result to the following error
+Save the changes and run the test again. This will now result to the following error
 ```
 1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
 Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: concerts (SQL: insert into "concerts" ("updated_at", "created_at") values (2018-06-17 09:18:25, 2018-06-17 09:18:25))
@@ -218,11 +185,7 @@ Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such ta
 php artisan make:migration create_concerts_table --create=concerts
 ```
 
-Running the test will still result to
-```
-1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
-Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 no such table: concerts (SQL: insert into "concerts" ("updated_at", "created_at") values (2018-06-17 09:18:25, 2018-06-17 09:18:25))
-```
+Running the test again however will result to the same error
 
 Locate the following code in PurchaseTicketsTest.php 
 ```
@@ -243,6 +206,8 @@ class PurchaseTicketsTest extends TestCase
     public function customer_can_purchase_tickets()
     {
 ```
+
+**NOTE: Adding this line will simply run the migration files automatically everytime the test is run**
 
 Running the test will now give us the following error
 ```
@@ -273,33 +238,28 @@ Expected status code 201 but received 404.
 Failed asserting that false is true.
 ```
 
-9. Create controller which will handle all concert ticket orders request by executing the following command
+9. Create controller which will handle all concert ticket order requests by executing the following command
 ```
 php artisan make:controller ConcertOrderController --model="App\Concert" --api
 ```
 
 Open the file ticketbeast/Http/Controllers/ConcertOrderController.php and locate the following code
 ```
-	public function store(Request $request)
-    {
-        //
-    }
+public function store(Request $request)
+{
+    //
+}
 ```
 
 Let's update it to the following for now
 ```
-	public function store(Request $request)
-    {
-        return response()->json([], 201);
-    }
+public function store(Request $request)
+{
+    return response()->json([], 201);
+}
 ```
 
-Save the changes and running the test will still result to the following error
-```
-1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
-Expected status code 201 but received 404.
-Failed asserting that false is true.
-```
+Save the changes and run the test. This will still result to the same error.
 
 Open ticketbeast/routes/web.php and append the following code
 ```
@@ -338,7 +298,7 @@ Time: 157 ms, Memory: 16.00MB
     }
 ```
 
-Quick note, total charges = ticket price x ticket quantity = 3250 x 3 = 9750
+**NOTE: total charges = ticket price x ticket quantity = 3250 x 3 = 9750 **
 
 Running the test will now give us the error
 ```
@@ -347,6 +307,7 @@ Illuminate\Database\QueryException: SQLSTATE[HY000]: General error: 1 table conc
 ```
 
 11. Open the create_concerts_table migration file and locate the following code
+
 **NOTE: Exact file names will be prefixed differently, _\<prefix\>_create_concerts_table.php_** 
 
 ```
@@ -665,49 +626,11 @@ Time: 149 ms, Memory: 16.00MB
 OK (1 test, 2 assertions)
 ```
 
-
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Harlequin Doyon** - *Resource Speaker* - [harlekoy](https://github.com/harlekoy)
+* **Laravel Cebu** - *Event organizers* - [laravelcebu](https://github.com/laravelcebu)
+* **Ian Panara** - *Documentation* - [fatcodingbastard](https://github.com/fatcodingbastard)
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
@@ -718,6 +641,8 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## Acknowledgments
 
 * Hat tip to anyone whose code was used
-* Inspiration
+* Sponsors
+* Event Organizers
+* Resource speakers
 * etc
 
