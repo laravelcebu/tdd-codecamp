@@ -2,7 +2,7 @@
 
 namespace App\Billing;
 
-class FakePaymentGateway
+class FakePaymentGateway implements PaymentGateway
 {
 	protected $charges;
 

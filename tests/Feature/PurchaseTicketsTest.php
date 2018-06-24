@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Billing\FakePaymentGateway;
+use App\Billing\PaymentGateway;
 use App\Concert;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -11,22 +12,24 @@ use Tests\TestCase;
 
 class PurchaseTicketsTest extends TestCase
 {
-	use DatabaseMigrations;
-	
+    use DatabaseMigrations;
+    
     /** @test */
     public function customer_can_purchase_tickets()
     {
         // Arrange
         $paymentGateway = new FakePaymentGateway();
+        $this->app->instance(PaymentGateway::class, $paymentGateway);
+        
         $concert = factory(Concert::class)->create([
-        	'ticket_price' => 3250
+            'ticket_price' => 3250
         ]);
 
         // Act
         $response = $this->post("concerts/{$concert->id}/orders", [
-        	'email' 			=> 'john@example.com',
-            'ticket_quantity' 	=> 3,
-            'payment_gateway' 	=> $paymentGateway->getValidTestToken()
+            'email'             => 'john@example.com',
+            'ticket_quantity'   => 3,
+            'payment_gateway'   => $paymentGateway->getValidTestToken()
         ]);
 
         // Assert

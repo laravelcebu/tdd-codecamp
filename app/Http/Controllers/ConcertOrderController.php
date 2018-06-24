@@ -3,11 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Billing\FakePaymentGateway;
+use App\Billing\PaymentGateway;
 use App\Concert;
 use Illuminate\Http\Request;
 
 class ConcertOrderController extends Controller
 {
+    protected $paymentGateway;
+
+    public function __construct(PaymentGateway $paymentGateway)
+    {
+        $this->paymentGateway = $paymentGateway;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -26,11 +34,10 @@ class ConcertOrderController extends Controller
      */
     public function store(Request $request, $concertId)
     {
-        $paymentGateway = new FakePaymentGateway();
         $concert = Concert::find($concertId);
 
         $amount = $concert->ticket_price * $request->get('ticket_quantity');
-        $paymentGateway->charge($amount, $request->get('payment_gateway'));
+        $this->paymentGateway->charge($amount, $request->get('payment_gateway'));
 
         return response()->json([], 201);
     }

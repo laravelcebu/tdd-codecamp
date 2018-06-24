@@ -533,8 +533,137 @@ Save and run the test so the result will now be
 Failed asserting that 0 matches expected 9750.
 ```
 
+14. Let's recap
+At the end of step 12 we had the following error
+```
+1) Tests\Feature\PurchaseTicketsTest::customer_can_purchase_tickets
+Failed asserting that 0 matches expected 9750.
+```
 
+During step 13 we added the charge logic which is 
+```
+total charges = ticket price x ticket quantity
+```
 
+However we still arrived on the same error before at the beginning of step 13!
+
+Why?
+
+Remember this from PurchaseTicketsTest.php?
+```
+$paymentGateway = new FakePaymentGateway();
+```
+
+We can see here that a new fake payment gateway is being initialized
+
+Moving along the customer_can_purchase_tickets method you will see 
+```
+$response = $this->post("concerts/{$concert->id}/orders", [
+    'email'             => 'john@example.com',
+    'ticket_quantity'   => 3,
+    'payment_gateway'   => $paymentGateway->getValidTestToken()
+]);
+```
+
+Which calls the store method in ConcertOrderController.php and a new fake payment gateway is being initialized 
+```
+$paymentGateway = new FakePaymentGateway();
+```
+
+Even thou we added the charge logic and invoke the fake payment gateway charge method and seen below
+```
+$amount = $concert->ticket_price * $request->get('ticket_quantity');
+$paymentGateway->charge($amount, $request->get('payment_gateway'));
+```
+
+Because $paymentGateway in PurchaseTicketsTest.php is a different instance of FakePaymentGateway from that of $paymentGateway in ConcertOrderController.php it will not be able to receive the changes that have been made when the charge method was invoked in ConcertOrderController.php.
+
+To resolve this we need to modify the FakePaymentGateway so it implements the Singleton design pattern, ergo it will return the same exact instance everytime it is initialized.
+
+Let's get started.
+
+Create a file named PaymentGateway.php under ticketbeast\app\Billing and with the following content
+```
+<?php
+
+namespace App\Billing;
+
+interface PaymentGateway
+{
+    public function charge($amount, $token);
+}
+```
+
+Update FakePaymentGateway so that it now looks like this
+```
+class FakePaymentGateway implements PaymentGateway
+```
+
+Next update ConcertOrderController.php to
+```
+use App\Billing\FakePaymentGateway;
+use App\Billing\PaymentGateway;
+use App\Concert;
+use Illuminate\Http\Request;
+
+class ConcertOrderController extends Controller
+{
+    protected $paymentGateway;
+
+    public function __construct(PaymentGateway $paymentGateway)
+    {
+        $this->paymentGateway = $paymentGateway;
+    }
+```
+
+And the store method to
+```
+public function store(Request $request, $concertId)
+{
+    $concert = Concert::find($concertId);
+
+    $amount = $concert->ticket_price * $request->get('ticket_quantity');
+    $this->paymentGateway->charge($amount, $request->get('payment_gateway'));
+
+    return response()->json([], 201);
+}
+```
+
+Next we will update PurchaseTicketsTest.php to
+```
+use App\Billing\FakePaymentGateway;
+use App\Concert;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+
+class PurchaseTicketsTest extends TestCase
+```
+
+And customer_can_purchase_tickets to
+```
+public function customer_can_purchase_tickets()
+{
+    // Arrange
+    $paymentGateway = new FakePaymentGateway();
+    $this->app->instance(PaymentGateway::class, $paymentGateway);
+    
+    $concert = factory(Concert::class)->create([
+        'ticket_price' => 3250
+    ]);
+```
+
+If we run the test again, we should have arrive at a green light with a message similar or equal to
+```
+PHPUnit 7.2.4 by Sebastian Bergmann and contributors.
+
+.                                                                   1 / 1 (100%)
+
+Time: 149 ms, Memory: 16.00MB
+
+OK (1 test, 2 assertions)
+```
 
 
 
